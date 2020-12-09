@@ -11,6 +11,8 @@ from blogger.models import temp_file_names, db
 
 from blogger import app
 
+DEBUG = False
+
 ALLOWED_EXTENSIONS = { 'pdf', 'png', 'jpg', 'jpeg', 'gif','heic','tiff','webp'}
 
 
@@ -58,7 +60,6 @@ def webp_conversion_to_jpg(main_dict):
         return True, main_dict
     else:
         return True, main_dict
-
 
 
 
@@ -243,7 +244,7 @@ def convert_images_to_pdf(image_list):
                 pdf.add_page()
                 pdf.image(image)
             else:
-                print('image width/hieght  larger than pdf')
+                print('image width/hieght  larger than pdf') if DEBUG else None
                 max_width = 510   # max size of portrait a4 pdf width in mm (700)
                 max_height = 1000    # max size of portrait a4 pdf width in mm (1120)
                 width, height = float(width1), float(height1)
@@ -263,18 +264,18 @@ def convert_images_to_pdf(image_list):
                     height = height * ratio
                     width = width * ratio
                 else:
-                    print('pdf merger: image size lesser than maxwidth and maxhieght','height',height,'weight',width)
-                print('converted',width,height,ratio)
+                    print('pdf merger: image size lesser than maxwidth and maxhieght','height',height,'weight',width)   if DEBUG else None
+                print('converted',width,height,ratio)   if DEBUG else None
                 pdf.add_page()
                 mpl = Image.open(image)
-                print(mpl.size,'before')
+                print(mpl.size,'before')   if DEBUG else None
                 foo = mpl.resize((round(width), round(height)),Image.ANTIALIAS)
-                print(foo.size,'after')
+                print(foo.size,'after')    if DEBUG else None
                 new_file = ''.join(random.choices(string.ascii_letters + string.digits, k=10))+".jpeg"
                 foo = foo.convert('RGB')
                 foo.save("temp/"+new_file,quality=100)
                 pdf.image("temp/"+new_file)
-                print('image size is greater than the pdf size, shrinking the image')
+                print('image size is greater than the pdf size, shrinking the image')   if DEBUG else None
         except Exception as e:
             return False,e       # check before deployment
     pdf.output(result_path, "F")
@@ -303,11 +304,6 @@ def allowed_file(filename):
 @app.route('/file-upload', methods=['POST'])
 def upload_file():
     # check if the post request has the file part
-    # if 'file' not in request.files:
-    #     resp = jsonify({'message': 'No file part in the request'})
-    #     resp.status_code = 400
-    #     return resp
-    # file = request.files['file']
     temp_dir = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     files = request.files.getlist('files[]')            # add in form data key:files[]  value:array of files
     print(files)
@@ -379,7 +375,7 @@ def upload_file():
                     file_dict['gif'] = {'paths': ['temp/' + filename], 'count': 1}
             else:
                 print('some new img type found')
-            print('file_dict',file_dict)
+            print('file_dict',file_dict) if DEBUG else None
             # pdf conversion
             file.save(os.path.join('temp', filename))
 
@@ -392,7 +388,7 @@ def upload_file():
     # image conversion (.TIFF)
     check,dict = tiff_conversion_to_jpeg(file_dict)
     if check:
-        print('tiff imasge conversion success')
+        print('tiff imasge conversion success')     if DEBUG else None
         file_dict = dict
     else:
         print('tiff image conversion didnt take place or failed')
@@ -406,17 +402,17 @@ def upload_file():
     # image conversion (.gif)
     check, dict = gif_conversion_to_jpg(file_dict)
     if check:
-        print('gif imasge conversion success',check)
+        print('gif imasge conversion success',check)        if DEBUG else None
         file_dict = dict
     else:
         print('gif image conversion didnt take place or failed')
     check, dict = webp_conversion_to_jpg(file_dict)
     if check:
-        print('webp imasge conversion success',check)
+        print('webp imasge conversion success',check)       if DEBUG else None
         file_dict = dict
         print(file_dict)
     else:
-        print('webp image conversion didnt take place or failed')
+        print('webp image conversion didnt take place or failed')       if DEBUG else None
 
     # pdf creation.
 
