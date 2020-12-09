@@ -1,37 +1,22 @@
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 import datetime
 from blogger import app
 
 db = SQLAlchemy(app)
 
-
-class User(db.Model):
-    uid = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    firstname = db.Column(db.String(50))
-    lastname = db.Column(db.String(50))
-    username = db.Column(db.String(50), unique=True, index=True)
-    password = db.Column(db.String(50))
-    email = db.Column(db.String(50), unique=True, index=True)
-    dateofreg = db.Column(db.DateTime, default=datetime.datetime.now)
-
-    def __init__(self, firstname, lastname, username, password, email):
-        self.firstname = firstname
-        self.lastname = lastname
-        self.username = username
-        self.password = password
-        self.email = email
-
-
-class Posts(db.Model):
+class temp_file_names(db.Model):
     pid = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(100))
-    description = db.Column(db.String(1000))
-    puid = db.Column(db.Integer, db.ForeignKey('user.uid'))
+    temp_id = db.Column(db.String(100),nullable=True)
+    user_id = db.Column(db.String(100),nullable=True)
+    temp_file_type = db.Column(db.String(100),nullable=True)
+    temp_file_name = db.Column(db.String(1000),nullable=True)
+    status = db.Column(db.String(1000),default='saved')         # ['saved','cleaned']
 
-    def __init__(self, title, description, puid):
-        self.title = title
-        self.description = description
-        self.puid = puid
-
+    def __init__(self, temp_id, user_id,temp_file_type, temp_file_name,status):
+        self.temp_id = temp_id
+        self.user_id = user_id
+        self.temp_file_type = temp_file_type
+        self.temp_file_name = temp_file_name
+        self.status = status
 
 db.create_all()
