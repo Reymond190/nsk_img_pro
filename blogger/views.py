@@ -177,7 +177,6 @@ def tiff_conversion_to_jpeg(main_dict):
             base_dir = 'temp'  # constant base_dir
             temp_name = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
             filename = secure_filename(temp_name+".jpeg")
-
             try:
                 im = Image.open(old_file)
                 im = im.convert("RGB")
@@ -464,6 +463,7 @@ def upload_file():
     resp = jsonify({'message': 'Files successfully uploaded'})
     resp.status_code = 201
     return resp
+
 
 
 
